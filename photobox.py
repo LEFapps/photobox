@@ -3,6 +3,8 @@
 import RPi.GPIO as GPIO, time, os, subprocess
 import Adafruit_CharLCD as LCD
 import commands
+from picamera import PiCamera
+import datetime
 
 # LCD PIN CONFIGURATION
 lcd_rs        = 7
@@ -29,8 +31,12 @@ WAIT_LED = 2
 GPIO.setup(WAIT_LED, GPIO.OUT)
 GPIO.setup(GO_LED, GPIO.OUT)
 
-# DEFINE FUNCTIONS
+# SETUP CAMERA
+cam = PiCamera()
+cam.resolution = (1024, 768)
+cam.iso = 800
 
+# DEFINE FUNCTIONS
 def setLEDs(ready):
   if (ready):
     GPIO.output(WAIT_LED, False)
@@ -49,6 +55,7 @@ def message(m):
     currentMessage = m
 
 def init():
+  global cam
   print("Initializing photobox")
   setLEDs(False)
   ip = commands.getoutput('hostname -I').split(' ')[0]
@@ -56,20 +63,31 @@ def init():
   time.sleep(5)
 
 def action():
+  global cam
   print("Taking photo")
   message("Foto wordt\ngenomen")
   setLEDs(False)
-  # gpout = subprocess.check_output("gphoto2 --capture-image-and-download --filename /home/pi/photobooth_images/photobooth%H%M%S.jpg", stderr=subprocess.STDOUT, shell=True)
-  # print(gpout)
-  # subprocess.call("sudo /home/pi/scripts/photobooth/assemble_and_print", shell=True)
-  time.sleep(1)
-  for i in range(0,100):
-    message("Opslaan...\n"+str(i+1)+"%")
-    time.sleep(0.05)
-  time.sleep(1)
-  message('Klaar!')
-  time.sleep(2)
-  message('Verwijder stick\nof neem nog een foto')
+  subprocess.call(["umount","/media/usbdrive/"])
+  device = checkUSB()
+  if (device):
+    print("USB drive found:")
+    print(device)
+  else:
+    print("Error: No USB drive found")
+    return
+  mount = subprocess.call(["mount",str(device)+"1","/media/usbdrive/"])
+  if (mount == 0):
+    date = datetime.datetime.now().strftime("%d-%m-%Y-%H-%M-%S")
+    cam.capture("/media/usbdrive/avatar-"+str(date)+".jpg")
+    subprocess.call(["umount","/media/usbdrive/"])
+    print("Photo taken!")
+    message('Klaar!')
+    time.sleep(2)
+    message('Verwijder stick\nof neem nog een foto')
+  else:
+    print("Error mounting:")
+    print(mount)
+    message("Er ging iets mis\nFoutmelding: "+str(mount))
 
 def checkUSB():
   partitionsFile = open("/proc/partitions")
@@ -87,7 +105,7 @@ def checkUSB():
 # PROGRAM LOOP
 
 init()
-print('initcheck')
+print('Ready!')
 while True:
   if (checkUSB()):
     setLEDs(True)

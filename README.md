@@ -5,17 +5,17 @@ Waits for a USB stick, then takes a photo with a connected camera and then savin
 Loosely based on: http://www.instructables.com/id/Raspberry-Pi-photo-booth-controller/
 
 ## Libraries used
-* [gPhoto2](http://www.gphoto.org/)
+* [Picamera](https://picamera.readthedocs.io/en/release-1.13/index.html)
 * RPi.GPIO
 * Adafruit_CharLCD
 
 ## Tools
 
----STOP ACTIVE PYTHON SCRIPT---
+### STOP ACTIVE PYTHON SCRIPT
 pkill -f photobox.py
 
----COPY to PI---
+### COPY to PI
 scp photobox.py pi@192.168.0.191:/home/pi
 
----CONNECT to PI USING SSH---
+### CONNECT to PI USING SSH
 ssh 192.168.0.191 -l pi
