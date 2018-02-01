@@ -6,8 +6,8 @@ Loosely based on: http://www.instructables.com/id/Raspberry-Pi-photo-booth-contr
 
 ## Libraries used
 * [Picamera](https://picamera.readthedocs.io/en/release-1.13/index.html)
-* RPi.GPIO
-* Adafruit_CharLCD
+* [RPi.GPIO](https://github.com/adafruit/Adafruit_Python_GPIO)
+* [Adafruit_CharLCD](https://github.com/adafruit/Adafruit_Python_CharLCD)
 
 ## Tools
 

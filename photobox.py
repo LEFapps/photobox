@@ -7,13 +7,13 @@ from picamera import PiCamera
 import datetime
 
 # LCD PIN CONFIGURATION
-lcd_rs        = 7
-lcd_en        = 8
-lcd_d4        = 25
-lcd_d5        = 24
-lcd_d6        = 23
-lcd_d7        = 18
-lcd_backlight = 15
+lcd_rs        = 18
+lcd_en        = 23
+lcd_d4        = 24
+lcd_d5        = 25
+lcd_d6        = 8
+lcd_d7        = 7
+lcd_backlight = 11
 
 # Define LCD column and row size for 16x2 LCD.
 lcd_columns = 16
@@ -26,15 +26,15 @@ lcd = LCD.Adafruit_CharLCD(lcd_rs, lcd_en, lcd_d4, lcd_d5, lcd_d6, lcd_d7, lcd_c
 GPIO.setmode(GPIO.BCM)
 SWITCH = 4
 GPIO.setup(SWITCH, GPIO.IN)
-GO_LED = 3
-WAIT_LED = 2
+GO_LED = 2
+WAIT_LED = 3
 GPIO.setup(WAIT_LED, GPIO.OUT)
 GPIO.setup(GO_LED, GPIO.OUT)
 
 # SETUP CAMERA
 cam = PiCamera()
 cam.resolution = (1024, 768)
-cam.iso = 800
+cam.iso = 400
 
 # DEFINE FUNCTIONS
 def setLEDs(ready):
@@ -78,6 +78,8 @@ def action():
   mount = subprocess.call(["mount",str(device)+"1","/media/usbdrive/"])
   if (mount == 0):
     date = datetime.datetime.now().strftime("%d-%m-%Y-%H-%M-%S")
+    cam.start_preview()
+    time.sleep(2)
     cam.capture("/media/usbdrive/avatar-"+str(date)+".jpg")
     subprocess.call(["umount","/media/usbdrive/"])
     print("Photo taken!")
